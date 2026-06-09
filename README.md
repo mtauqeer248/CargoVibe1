@@ -89,7 +89,7 @@ npm test
 |---|---|
 | Backend | Azure Functions v4, TypeScript, Express (local adapter) |
 | Mobile | Expo, React Native, TypeScript |
-| AI | Claude API (Anthropic) |
+| AI |
 | Tests | Jest |
 
 ---
@@ -102,14 +102,14 @@ The app includes an AI-powered chat assistant. Tap the **✦ AI** button on the 
 - *"Are there any tankers arriving today?"*
 - *"Summarise the current status"*
 
-Requires an Anthropic API key. Add it to `backend/.env`:
+Requires an  API key. Add it to `backend/.env`:
 
 ```
-ANTHROPIC_API_KEY=your-key-here
+API_KEY=your-key-here
 ```
 
 ---
 
 ## Architecture Notes
 
-See [DECISIONS.md](./DECISIONS.md) for a full explanation of every technical decision made.
+See [ARCHITECTURE_AND_TECHNICAL_DECISIONS](./ARCHITECTURE_AND_TECHNICAL_DECISIONS.pdf) for a full explanation of every technical decision made.

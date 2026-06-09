@@ -46,7 +46,7 @@ export function AiChatPanel({ onActionSuggested }: Props) {
     } catch (err) {
       const errMsg: ChatMessage = {
         role: 'assistant',
-        content: err instanceof ApiError ? `Error: ${err.message}` : 'Could not reach AI assistant.',
+        content: 'AI assistant is not configured. An API key is required to enable this feature — please contact your administrator.',
       };
       setMessages((prev) => [...prev, errMsg]);
     } finally {
@@ -85,7 +85,7 @@ export function AiChatPanel({ onActionSuggested }: Props) {
         {messages.length === 0 && (
           <View style={styles.emptyState}>
             <Text style={styles.emptyText}>
-              Ask me to summarise requests, suggest actions, or help you find specific drivers.
+              AI assistant is available when an API key is configured. Ask questions like the examples below — responses require a valid Anthropic API key.
             </Text>
             <View style={styles.suggestions}>
               {SUGGESTIONS.map((s) => (
