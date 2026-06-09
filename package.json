@@ -1,0 +1,16 @@
+{
+  "name": "cargovibe",
+  "version": "1.0.0",
+  "private": true,
+  "description": "CargoVibe – Truck Parking Request Management (monorepo)",
+  "workspaces": [
+    "backend",
+    "mobile"
+  ],
+  "scripts": {
+    "backend": "npm run dev --workspace=backend",
+    "mobile": "npm run start --workspace=mobile",
+    "test": "npm run test --workspace=backend",
+    "install:all": "npm install"
+  }
+}

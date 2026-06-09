@@ -1,0 +1,32 @@
+{
+  "name": "@cargovibe-azure/backend",
+  "version": "1.0.0",
+  "description": "CargoVibe Azure Functions v4 Backend",
+  "main": "dist/src/index.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "npm run build && node dist/src/index.js",
+    "dev": "ts-node-dev --respawn --transpile-only src/index.ts",
+    "test": "jest --coverage",
+    "test:watch": "jest --watch"
+  },
+  "dependencies": {
+    "@azure/functions": "^4.16.0",
+    "cors": "^2.8.6",
+    "express": "^5.2.1",
+    "react-dom": "19.2.3",
+    "react-native-web": "^0.21.2",
+    "uuid": "^9.0.0"
+  },
+  "devDependencies": {
+    "@types/jest": "^29.5.11",
+    "@types/node": "^20.11.5",
+    "@types/supertest": "^6.0.2",
+    "@types/uuid": "^9.0.7",
+    "jest": "^29.7.0",
+    "supertest": "^6.3.4",
+    "ts-jest": "^29.1.2",
+    "ts-node-dev": "^2.0.0",
+    "typescript": "^5.3.3"
+  }
+}
