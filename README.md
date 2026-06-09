@@ -1,96 +1,74 @@
-# 🚚 CargoVibe – Truck Parking Request Manager
+# CargoVibe 🚚
 
-A fullstack monorepo for managing truck parking requests at logistics facilities.
+A fullstack application for managing truck parking requests.
+
+Built with **Azure Functions v4** (TypeScript) and **Expo** (React Native + Web).
+
+---
+
+## Project Structure
 
 ```
 cargovibe/
-├── backend/     Express + TypeScript API (Azure Functions–compatible)
-├── mobile/      Expo React Native app (iOS · Android · Web)
-└── README.md
+├── backend/     Azure Functions API (TypeScript)
+└── mobile/      Expo mobile app (iOS · Android · Web)
 ```
 
 ---
 
-## Quick Start
+## Getting Started
+
+### Prerequisites
+
+- Node.js v18+ — `brew install node`
+- Expo Go app on your phone (optional)
 
 ### 1. Backend
 
 ```bash
 cd backend
 npm install
-npm run dev           # → http://localhost:7071
+npm run dev
 ```
 
-The server starts with 3 seeded demo requests.
+Runs at `http://localhost:7071/api`
 
-### 2. Mobile App
+### 2. Mobile
 
 ```bash
 cd mobile
 npm install
-npm run web           # Browser at http://localhost:8081
-npm run android       # Android emulator
-npm run ios           # iOS simulator (macOS only)
+npm run web       # opens in browser at http://localhost:8081
+npm start         # scan QR code with Expo Go on your phone
 ```
 
-> **Native device**: set `EXPO_PUBLIC_API_URL=http://<your-LAN-IP>:7071` in `mobile/.env`
->
-> Example: `EXPO_PUBLIC_API_URL=http://192.168.1.42:7071`
+> **On a real device:** create `mobile/.env` and add:
+> `EXPO_PUBLIC_API_URL=http://YOUR_LOCAL_IP:7071/api`
 
 ---
 
-## Backend API
+## API Endpoints
 
-Base URL: `http://localhost:7071`
+Base URL: `http://localhost:7071/api`
 
-| Method   | Path                             | Description                        |
-|----------|----------------------------------|------------------------------------|
-| `GET`    | `/parking-requests`              | List all requests (newest first)   |
-| `GET`    | `/parking-requests/:id`          | Retrieve a single request          |
-| `POST`   | `/parking-requests`              | Create a new request               |
-| `PATCH`  | `/parking-requests/:id/status`   | Update status + optional spot/note |
-| `DELETE` | `/parking-requests/:id`          | Delete (non-final states only)     |
-| `POST`   | `/ai/chat`                       | AI assistant (natural language)    |
-| `GET`    | `/health`                        | Health check                       |
+| Method | Endpoint | Description |
+|---|---|---|
+| `GET` | `/parking-requests` | List all requests |
+| `GET` | `/parking-requests/:id` | Get a single request |
+| `POST` | `/parking-requests` | Create a new request |
+| `PATCH` | `/parking-requests/:id/status` | Update status |
+| `DELETE` | `/parking-requests/:id` | Delete a request |
+| `POST` | `/ai/chat` | AI assistant |
+| `GET` | `/health` | Health check |
 
-### Status Transition Model
+### Status Transitions
 
 ```
 pending ──► approved ──► checked_in ──► checked_out  (final)
         └──► rejected                                  (final)
 ```
 
-Final states (`rejected`, `checked_out`) are immutable and cannot be deleted.
-
-### Example: Create a Request
-
-```bash
-curl -X POST http://localhost:7071/parking-requests \
-  -H "Content-Type: application/json" \
-  -d '{
-    "driverName": "Hans Müller",
-    "licensePlate": "B-LK 1234",
-    "truckType": "semi",
-    "requestedFrom": "2026-06-10T08:00:00Z",
-    "requestedUntil": "2026-06-10T14:00:00Z"
-  }'
-```
-
-### Example: Approve with Parking Spot
-
-```bash
-curl -X PATCH http://localhost:7071/parking-requests/<id>/status \
-  -H "Content-Type: application/json" \
-  -d '{ "status": "approved", "parkingSpotId": "SPOT-A3" }'
-```
-
-### Example: AI Assistant
-
-```bash
-curl -X POST http://localhost:7071/ai/chat \
-  -H "Content-Type: application/json" \
-  -d '{ "message": "How many pending requests are there?" }'
-```
+Final states cannot be modified or deleted.
 
 ---
 
@@ -98,54 +76,40 @@ curl -X POST http://localhost:7071/ai/chat \
 
 ```bash
 cd backend
-npm test              # Unit + integration tests (Jest)
-npm test -- --coverage
+npm test
 ```
 
-**Current coverage:** 36 tests · 100% on routes · ~82% overall
+34 tests — repository unit tests and Azure Function handler tests.
 
 ---
 
-## Architecture Decisions
+## Tech Stack
 
-### Why Express instead of native Azure Functions?
-
-Azure Functions can be hosted locally via the `func` CLI, but it requires the
-Azure Functions Core Tools to be globally installed — which is not cross-platform
-friendly out of the box. Instead, the backend uses **Express** with the same
-handler signatures and structure as Azure Functions HTTP triggers, making it
-trivially portable: drop each router function into an Azure Function trigger
-with minimal adapter code. Port `7071` mirrors the Azure Functions local default.
-
-### Why in-memory storage?
-
-The brief asks for a **local** app. Introducing a database (SQLite, Postgres)
-adds setup friction that doesn't demonstrate more about the API design or
-business logic. The repository pattern (`ParkingRequestRepository`) cleanly
-abstracts the storage layer — swapping to a real DB only requires replacing
-the `Map` with DB queries inside the repository class.
-
-### State machine as first-class concept
-
-The transition model lives in a single source of truth (`STATUS_TRANSITIONS`)
-shared by both backend and mobile. This prevents "impossible state" bugs and
-makes the rules self-documenting.
-
-### AI Integration
-
-The `POST /ai/chat` endpoint injects a live snapshot of all parking requests
-as context into each Claude API call. This lets operators query in natural
-language ("any tankers arriving before noon?") and receive structured
-`suggestedAction` responses the app can execute automatically — a conversational
-co-pilot on top of the structured data.
+| Layer | Technology |
+|---|---|
+| Backend | Azure Functions v4, TypeScript, Express (local adapter) |
+| Mobile | Expo, React Native, TypeScript |
+| AI | Claude API (Anthropic) |
+| Tests | Jest |
 
 ---
 
-## What I'd add with more time
+## AI Assistant
 
-- **Persistence**: SQLite via `better-sqlite3` or a real Azure Table Storage adapter
-- **Auth**: JWT middleware so only authorised staff can approve/reject
-- **Push notifications**: Expo Notifications when a request is approved
-- **Optimistic updates**: Instant UI feedback before the API confirms
-- **Pagination**: cursor-based for the list endpoint
-- **E2E tests**: Detox for native, Playwright for web
+The app includes an AI-powered chat assistant. Tap the **✦ AI** button on the list screen to ask questions like:
+
+- *"How many pending requests are there?"*
+- *"Are there any tankers arriving today?"*
+- *"Summarise the current status"*
+
+Requires an Anthropic API key. Add it to `backend/.env`:
+
+```
+ANTHROPIC_API_KEY=your-key-here
+```
+
+---
+
+## Architecture Notes
+
+See [DECISIONS.md](./DECISIONS.md) for a full explanation of every technical decision made.
